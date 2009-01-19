@@ -6,6 +6,7 @@ process.CondDBCommon.connect = 'sqlite_file:offlinelumi.db'
 
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     process.CondDBCommon,
+    BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
     timetype = cms.untracked.string('lumiid'),
     logconnect = cms.untracked.string('sqlite_file:log.db'),
     toPut = cms.VPSet(cms.PSet(
