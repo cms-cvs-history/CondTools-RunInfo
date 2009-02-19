@@ -4,13 +4,14 @@ process = cms.Process("TEST")
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     DBParameters = cms.PSet(
         messageLevel = cms.untracked.int32(0),
-        authenticationPath = cms.untracked.string('.')
+        authenticationPath = cms.untracked.string('/afs/cern.ch/cms/DB/conddb')
     ),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('LuminosityInfoRcd'),
         tag = cms.string('lumitest')
     )),
-    connect = cms.string('sqlite_file:offlinelumi.db'),
+    #connect = cms.string('sqlite_file:offlinelumi.db'),
+    connect = cms.string('oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'),                                  
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')                          
 )
 
