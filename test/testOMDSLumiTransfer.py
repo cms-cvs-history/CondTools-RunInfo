@@ -3,7 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("TEST")
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 process.CondDBCommon.connect = 'sqlite_file:offlinelumi.db'
-process.CondDBCommon.DBParameters.authenticationPath = '/afs/cern.ch/user/x/xiezhen'
+#process.CondDBCommon.connect = 'oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'
+process.CondDBCommon.DBParameters.authenticationPath = '/nfshome0/xiezhen'
 
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     process.CondDBCommon,
@@ -29,7 +30,8 @@ process.lumio2o = cms.EDAnalyzer("LuminosityPopConAnalyzer",
       startRun = cms.untracked.int32(70674),
       numberOfRuns = cms.untracked.int32(1),
       connect = cms.string('oracle://cms_omds_lb/CMS_LUMI'),
-      authenticationPath = cms.string('/afs/cern.ch/user/x/xiezhen')
+      lumiVersionNumber = cms.int32(1),
+      authenticationPath = cms.string('/nfshome0/xiezhen')
     ),
     SinceAppendMode = cms.bool(False),
     name = cms.untracked.string('LuminosityInfo'),
