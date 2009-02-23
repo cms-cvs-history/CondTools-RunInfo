@@ -26,7 +26,8 @@ process.lumio2o = cms.EDAnalyzer("LuminosityPopConAnalyzer",
     Source = cms.PSet(
       lumiReaderName = cms.string('dummy'),
       startRun = cms.untracked.int32(10),
-      numberOfRuns = cms.untracked.int32(2)
+      numberOfRuns = cms.untracked.int32(2),
+      lumiVersionNumber = cms.int32(1)
     ),
     SinceAppendMode = cms.bool(True),
     name = cms.untracked.string('LuminosityInfo'),
