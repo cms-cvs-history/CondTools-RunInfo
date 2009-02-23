@@ -1,0 +1,143 @@
+SQL> select table_name from all_catalog where owner='CMS_LUMI';
+
+TABLE_NAME
+------------------------------
+ABOVE_THRESHOLD2_OCCUPANCIES
+BELOW_THRESHOLD1_OCCUPANCIES
+BETWEEN_THRSHLD12_OCCUPANCIES
+CMS_RUNS
+ET_SUMS
+HLTS
+HLT_SEQ
+L1_TRG_SEQ
+LEVEL1_TRIGGERS
+LUMI_ALL_HISTGRAM_SEQ
+LUMI_ALL_SEQ
+
+TABLE_NAME
+------------------------------
+LUMI_DETAILS
+LUMI_DTLS_SEQ
+LUMI_HF_RING_SETS
+LUMI_HF_RNGSET_SEQ
+LUMI_HISTORY_SEQ
+LUMI_SECTIONS
+LUMI_SECTION_HSTS
+LUMI_SECTION_SEQ
+LUMI_SMRY_SEQ
+LUMI_SUMMARIES
+LUMI_TAGS
+
+TABLE_NAME
+------------------------------
+LUMI_TAG_SEQ
+LUMI_VERSION_TAG_MAPS
+LVERTAGM_SEQ
+TEST
+TRG_DTIME_DEF_SEQ
+TRG_DTIME_SEQ
+TRIGGER_DEADTIMES
+TRIGGER_DEADTIME_DEFS
+
+30 rows selected.
+
+SQL> describe cms_lumi.lumi_sections;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ---------------------------- SECTION_ID                                NOT NULL NUMBER(38)
+ RUN_NUMBER                                NOT NULL NUMBER(10)
+ RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ IS_RECORD_DELETED                         NOT NULL VARCHAR2(1)
+ IS_DATA_TAKING                            NOT NULL NUMBER(1)
+ LUMI_SECTION_NUMBER                                NUMBER(10)
+ BEGIN_ORBIT_NUMBER                                 NUMBER(10)
+ NUMBER_ORBITS                                      NUMBER(10)
+ RING_SET_ID                                        NUMBER(38)
+ FILL_NUMBER                                        NUMBER(10)
+ SEC_START_TIME                                     NUMBER(38)
+ SEC_STOP_TIME                                      NUMBER(38)
+ RECORD_INSERTION_USER                              VARCHAR2(50)
+ RECORD_LASTUPDATE_TIME                             TIMESTAMP(6) WITH TIME ZONE
+ RECORD_LASTUPDATE_USER                             VARCHAR2(50)
+ COMMENTS                                           VARCHAR2(200)
+
+SQL> describe cms_lumi.lumi_details
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ---------------------------- RECORD_ID                                 NOT NULL NUMBER(38)
+ SECTION_ID                                NOT NULL NUMBER(38)
+ IS_RECORD_DELETED                         NOT NULL VARCHAR2(1)
+ RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ BUNCH_X_NUMBER                            NOT NULL NUMBER(4)
+ NORMALIZATION_ET                                   NUMBER(36)
+ ET_LUMI                                            NUMBER(12,9)
+ ET_LUMI_ERR                                        NUMBER(12,9)
+ ET_LUMI_QLTY                                       NUMBER(3)
+ NORMALIZATION_OCC_D1                               NUMBER(36)
+ OCC_LUMI_D1                                        NUMBER(12,9)
+ OCC_LUMI_D1_ERR                                    NUMBER(12,9)
+ OCC_LUMI_D1_QLTY                                   NUMBER(3)
+ NORMALIZATION_OCC_D2                               NUMBER(36)
+ OCC_LUMI_D2                                        NUMBER(12,9)
+ OCC_LUMI_D2_ERR                                    NUMBER(12,9)
+ OCC_LUMI_D2_QLTY                                   NUMBER(3)
+ RECORD_INSERTION_USER                              VARCHAR2(50)
+
+SQL> describe CMS_LUMI.LUMI_SUMMARIES;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ---------------------------- LUMI_SUMMARY_ID                           NOT NULL NUMBER(38)
+ SECTION_ID                                NOT NULL NUMBER(38)
+ IS_RECORD_DELETED                         NOT NULL VARCHAR2(1)
+ RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ LUMI_VERSION                                       NUMBER(2)
+ DEADTIME_NORMALIZATION                             NUMBER(8,7)
+ NORMALIZATION                                      NUMBER(36)
+ INSTANT_LUMI                                       NUMBER(12,9)
+ INSTANT_LUMI_ERR                                   NUMBER(12,9)
+ INSTANT_LUMI_QLTY                                  NUMBER(3)
+ NORMALIZATION_ET                                   NUMBER(36)
+ INSTANT_ET_LUMI                                    NUMBER(12,9)
+ INSTANT_ET_LUMI_ERR                                NUMBER(12,9)
+ INSTANT_ET_LUMI_QLTY                               NUMBER(3)
+ NORMALIZATION_OCC_D1                               NUMBER(36)
+ INSTANT_OCC_LUMI_D1                                NUMBER(12,9)
+ INSTANT_OCC_LUMI_D1_ERR                            NUMBER(12,9)
+ INSTANT_OCC_LUMI_D1_QLTY                           NUMBER(3)
+ NORMALIZATION_OCC_D2                               NUMBER(36)
+ INSTANT_OCC_LUMI_D2                                NUMBER(12,9)
+ INSTANT_OCC_LUMI_D2_ERR                            NUMBER(12,9)
+ INSTANT_OCC_LUMI_D2_QLTY                           NUMBER(3)
+ RECORD_INSERTION_USER                              VARCHAR2(50)
+
+
+SQL> describe CMS_LUMI.HLTS;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ---------------------------- HLT_ID                                    NOT NULL NUMBER(38)
+ RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ SECTION_ID                                NOT NULL NUMBER(38)
+ TRIGGER_PATH                                       VARCHAR2(128)
+ INPUT_COUNT                                        NUMBER(11)
+ ACCEPT_COUNT                                       NUMBER(11)
+ PRESCALE_FACTOR                                    NUMBER(11)
+ RECORD_INSERTION_USER                              VARCHAR2(50)
+ RECORD_LASTUPDATE_TIME                             TIMESTAMP(6) WITH TIME ZONE
+ RECORD_LASTUPDATE_USER                             VARCHAR2(50)
+
+
+SQL> describe cms_lumi.LUMI_VERSION_TAG_MAPS;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ MAP_ID 				   NOT NULL NUMBER(38)
+ LUMI_SUMMARY_ID			   NOT NULL NUMBER(38)
+ LUMI_TAG_ID				   NOT NULL NUMBER(38)
+ IS_RECORD_DELETED			   NOT NULL VARCHAR2(1)
+ RECORD_INSERTION_TIME			   NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ RECORD_INSERTION_USER				    VARCHAR2(50)
+
+SQL> describe cms_lumi.LUMI_TAGS;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LUMI_TAG_ID				   NOT NULL NUMBER(38)
+ TAG_NAME				   NOT NULL VARCHAR2(50)
+ RECORD_INSERTION_TIME			   NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ RECORD_INSERTION_USER				    VARCHAR2(50)
+
+
