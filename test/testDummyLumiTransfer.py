@@ -25,7 +25,7 @@ process.source = cms.Source("EmptyIOVSource",
 process.lumio2o = cms.EDAnalyzer("LuminosityPopConAnalyzer",
     Source = cms.PSet(
       lumiReaderName = cms.string('dummy'),
-      startRun = cms.untracked.int32(10),
+      startRun = cms.int32(10),
       numberOfRuns = cms.untracked.int32(2),
       lumiVersionNumber = cms.int32(1)
     ),

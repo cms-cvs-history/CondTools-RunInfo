@@ -8,7 +8,7 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     ),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('LuminosityInfoRcd'),
-        tag = cms.string('lumitest')
+        tag = cms.string('globalrun')
     )),
     connect = cms.string('sqlite_file:offlinelumi.db'),
     #connect = cms.string('oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'),                                  
@@ -17,8 +17,8 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
 
 process.source = cms.Source("EmptyIOVSource",
     timetype = cms.string('lumiid'),
-    firstValue = cms.uint64(42949672962),
-    lastValue = cms.uint64(42949672964),
+    firstValue = cms.uint64(356641199357953),
+    lastValue = cms.uint64(356641199357955),
     interval = cms.uint64(1)
 )
 
