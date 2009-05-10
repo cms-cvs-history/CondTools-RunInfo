@@ -14,13 +14,24 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     #connect = cms.string('oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'),                                  
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')                          
 )
-
-process.source = cms.Source("EmptyIOVSource",
-    timetype = cms.string('lumiid'),
-    firstValue = cms.uint64(356641199357953),
-    lastValue = cms.uint64(356641199357955),
-    interval = cms.uint64(1)
+ 
+process.maxEvents = cms.untracked.PSet(
+     input = cms.untracked.int32(1)
 )
+
+process.source = cms.Source("EmptySource",
+     numberEventsInRun = cms.untracked.uint32(1),
+     firstRun = cms.untracked.uint32(83037),
+     numberEventsInLuminosityBlock = cms.untracked.uint32(1),
+     firstLuminosityBloc = cms.untracked.uint32(1)
+)
+
+#process.source = cms.Source("EmptyIOVSource",
+#    timetype = cms.string('lumiid'),
+#    firstValue = cms.uint64(356641199357953),
+#    lastValue = cms.uint64(356641199357955),
+#    interval = cms.uint64(1)
+#)
 
 process.prod = cms.EDAnalyzer("LuminosityInfoAnalyzer")
 
