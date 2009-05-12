@@ -25,7 +25,7 @@ process.source = cms.Source("EmptyIOVSource",
 process.hltscalero2o = cms.EDAnalyzer("HLTScalerPopConAnalyzer",
     Source = cms.PSet(
       hltscalerReaderName = cms.string('dummy'),
-      startRun = cms.untracked.int32(10),
+      startRun = cms.int32(10),
       numberOfRuns = cms.untracked.int32(2)
     ),
     SinceAppendMode = cms.bool(True),
