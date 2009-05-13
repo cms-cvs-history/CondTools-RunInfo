@@ -23,7 +23,7 @@ process.source = cms.Source("EmptySource",
      numberEventsInRun = cms.untracked.uint32(1),
      firstRun = cms.untracked.uint32(83037),
      numberEventsInLuminosityBlock = cms.untracked.uint32(1),
-     firstLuminosityBloc = cms.untracked.uint32(1)
+     firstLuminosityBlock = cms.untracked.uint32(1)
 )
 
 #process.source = cms.Source("EmptyIOVSource",
