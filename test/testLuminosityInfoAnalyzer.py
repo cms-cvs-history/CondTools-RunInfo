@@ -16,11 +16,10 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
 )
  
 process.maxEvents = cms.untracked.PSet(
-     input = cms.untracked.int32(1)
+     input = cms.untracked.int32(21)
 )
-
 process.source = cms.Source("EmptySource",
-     numberEventsInRun = cms.untracked.uint32(1),
+     numberEventsInRun = cms.untracked.uint32(21),
      firstRun = cms.untracked.uint32(83037),
      numberEventsInLuminosityBlock = cms.untracked.uint32(1),
      firstLuminosityBlock = cms.untracked.uint32(1)
@@ -29,7 +28,7 @@ process.source = cms.Source("EmptySource",
 #process.source = cms.Source("EmptyIOVSource",
 #    timetype = cms.string('lumiid'),
 #    firstValue = cms.uint64(356641199357953),
-#    lastValue = cms.uint64(356641199357955),
+#    lastValue = cms.uint64(356641199357973),
 #    interval = cms.uint64(1)
 #)
 
