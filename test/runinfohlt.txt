@@ -12,3 +12,11 @@ SQL> describe hlt_supervisor_lumisections_v2
  PREJECT				   NOT NULL NUMBER(11)
  PRESCALEMODULE 			   NOT NULL VARCHAR2(128)
  PSINDEX				   NOT NULL NUMBER(11)
+
+create table hlt_supervisor_scalar_map (
+runnr	          number(11) not null,
+hltkey	          number(11) not null,
+modificationtime  timestamp(6) not null,
+pathname          varchar2(128) not null,
+scalararray       varchar2(256) not null,
+);
