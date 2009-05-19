@@ -8,9 +8,9 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     ),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('HLTScalerRcd'),
-        tag = cms.string('globalrunhltscaler')
+        tag = cms.string('hltscaler83037')
     )),
-    connect = cms.string('sqlite_file:hlt.db'),
+    connect = cms.string('sqlite_file:offlinelumi.db'),
     #connect = cms.string('oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'),                                  
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService')                          
 )
