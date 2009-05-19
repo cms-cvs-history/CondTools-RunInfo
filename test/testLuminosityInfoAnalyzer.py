@@ -8,7 +8,7 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     ),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('LuminosityInfoRcd'),
-        tag = cms.string('globalrun')
+        tag = cms.string('lumi83037_v1')
     )),
     connect = cms.string('sqlite_file:offlinelumi.db'),
     #connect = cms.string('oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'),                                  

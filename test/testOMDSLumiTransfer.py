@@ -13,7 +13,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     logconnect = cms.untracked.string('sqlite_file:log.db'),
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('LuminosityInfoRcd'),
-        tag = cms.string('globalrun')
+        tag = cms.string('lumi83037_v1')
     ))
 )
 

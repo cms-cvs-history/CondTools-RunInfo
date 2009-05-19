@@ -14,7 +14,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     logconnect = cms.untracked.string('sqlite_file:log.db'),
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('HLTScalerInfoRcd'),
-        tag = cms.string('globalrunhltscaler')
+        tag = cms.string('hltscaler83037')
     ))
 )
 
