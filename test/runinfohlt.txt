@@ -13,6 +13,16 @@ SQL> describe hlt_supervisor_lumisections_v2
  PRESCALEMODULE 			   NOT NULL VARCHAR2(128)
  PSINDEX				   NOT NULL NUMBER(11)
 
+SQL> describe HLT_SUPERVISOR_SCALAR_MAP;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ RUNNR					   NOT NULL NUMBER(11)
+ HLTKEY 				   NOT NULL NUMBER(11)
+ MODIFICATIONTIME			   NOT NULL TIMESTAMP(6)
+ PATHNAME				   NOT NULL VARCHAR2(128)
+ PSINDEX				   NOT NULL NUMBER(11)
+ PSVALUE				   NOT NULL NUMBER(11)
+
 
 create table hlt_supervisor_scalar_map (
 runnr	          number(11) not null,
