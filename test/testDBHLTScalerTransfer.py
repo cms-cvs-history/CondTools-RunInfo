@@ -5,7 +5,7 @@ process.load("CondCore.DBCommon.CondDBCommon_cfi")
 process.CondDBCommon.connect = 'sqlite_file:offlinelumi.db'
 #process.CondDBCommon.connect = 'oracle://cms_orcoff_prep/CMS_COND_RUN_INFO'
 process.CondDBCommon.DBParameters.authenticationPath = '/nfshome0/xiezhen'
-process.CondDBCommon.DBParameters.messageLevel = 1
+process.CondDBCommon.DBParameters.messageLevel = 0
 
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     process.CondDBCommon,
@@ -28,10 +28,11 @@ process.source = cms.Source("EmptyIOVSource",
 process.hltscalero2o = cms.EDAnalyzer("HLTScalerPopConAnalyzer",
     Source = cms.PSet(
       hltscalerReaderName = cms.string('db'),
-      startRun = cms.int32(102087),
-      numberOfRuns = cms.untracked.int32(1),
+      startRun = cms.int32(102310),
+      numberOfRuns = cms.untracked.int32(30),
       connect = cms.string('oracle://cms_rcms/CMS_RUNINFO'),
-      authenticationPath = cms.string('/nfshome0/xiezhen')
+      authenticationPath = cms.string('/nfshome0/xiezhen'),
+      messageLevel = cms.untracked.int32(0)
     ),
     SinceAppendMode = cms.bool(True),
     name = cms.untracked.string('HLTScalerInfo'),
