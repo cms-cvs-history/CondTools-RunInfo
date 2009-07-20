@@ -60,84 +60,63 @@ SQL> describe cms_lumi.lumi_sections;
  RECORD_LASTUPDATE_USER                             VARCHAR2(50)
  COMMENTS                                           VARCHAR2(200)
 
-SQL> describe cms_lumi.lumi_details
- Name                                      Null?    Type
- ----------------------------------------- -------- ---------------------------- RECORD_ID                                 NOT NULL NUMBER(38)
- SECTION_ID                                NOT NULL NUMBER(38)
- IS_RECORD_DELETED                         NOT NULL VARCHAR2(1)
- RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
- BUNCH_X_NUMBER                            NOT NULL NUMBER(4)
- NORMALIZATION_ET                                   NUMBER(36)
- ET_LUMI                                            NUMBER(12,9)
- ET_LUMI_ERR                                        NUMBER(12,9)
- ET_LUMI_QLTY                                       NUMBER(3)
- NORMALIZATION_OCC_D1                               NUMBER(36)
- OCC_LUMI_D1                                        NUMBER(12,9)
- OCC_LUMI_D1_ERR                                    NUMBER(12,9)
- OCC_LUMI_D1_QLTY                                   NUMBER(3)
- NORMALIZATION_OCC_D2                               NUMBER(36)
- OCC_LUMI_D2                                        NUMBER(12,9)
- OCC_LUMI_D2_ERR                                    NUMBER(12,9)
- OCC_LUMI_D2_QLTY                                   NUMBER(3)
- RECORD_INSERTION_USER                              VARCHAR2(50)
-
-SQL> describe CMS_LUMI.LUMI_SUMMARIES;
- Name                                      Null?    Type
- ----------------------------------------- -------- ---------------------------- LUMI_SUMMARY_ID                           NOT NULL NUMBER(38)
- SECTION_ID                                NOT NULL NUMBER(38)
- IS_RECORD_DELETED                         NOT NULL VARCHAR2(1)
- RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
- LUMI_VERSION                                       NUMBER(2)
- DEADTIME_NORMALIZATION                             NUMBER(8,7)
- NORMALIZATION                                      NUMBER(36)
- INSTANT_LUMI                                       NUMBER(12,9)
- INSTANT_LUMI_ERR                                   NUMBER(12,9)
- INSTANT_LUMI_QLTY                                  NUMBER(3)
- NORMALIZATION_ET                                   NUMBER(36)
- INSTANT_ET_LUMI                                    NUMBER(12,9)
- INSTANT_ET_LUMI_ERR                                NUMBER(12,9)
- INSTANT_ET_LUMI_QLTY                               NUMBER(3)
- NORMALIZATION_OCC_D1                               NUMBER(36)
- INSTANT_OCC_LUMI_D1                                NUMBER(12,9)
- INSTANT_OCC_LUMI_D1_ERR                            NUMBER(12,9)
- INSTANT_OCC_LUMI_D1_QLTY                           NUMBER(3)
- NORMALIZATION_OCC_D2                               NUMBER(36)
- INSTANT_OCC_LUMI_D2                                NUMBER(12,9)
- INSTANT_OCC_LUMI_D2_ERR                            NUMBER(12,9)
- INSTANT_OCC_LUMI_D2_QLTY                           NUMBER(3)
- RECORD_INSERTION_USER                              VARCHAR2(50)
-
-
-SQL> describe CMS_LUMI.HLTS;
- Name                                      Null?    Type
- ----------------------------------------- -------- ---------------------------- HLT_ID                                    NOT NULL NUMBER(38)
- RECORD_INSERTION_TIME                     NOT NULL TIMESTAMP(6) WITH TIME ZONE
- SECTION_ID                                NOT NULL NUMBER(38)
- TRIGGER_PATH                                       VARCHAR2(128)
- INPUT_COUNT                                        NUMBER(11)
- ACCEPT_COUNT                                       NUMBER(11)
- PRESCALE_FACTOR                                    NUMBER(11)
- RECORD_INSERTION_USER                              VARCHAR2(50)
- RECORD_LASTUPDATE_TIME                             TIMESTAMP(6) WITH TIME ZONE
- RECORD_LASTUPDATE_USER                             VARCHAR2(50)
-
-
-SQL> describe cms_lumi.LUMI_VERSION_TAG_MAPS;
+SQL> describe cms_lumi.lumi_details;
  Name					   Null?    Type
  ----------------------------------------- -------- ----------------------------
- MAP_ID 				   NOT NULL NUMBER(38)
+ RECORD_ID				   NOT NULL NUMBER(38)
+ SECTION_ID				   NOT NULL NUMBER(38)
+ IS_RECORD_DELETED			   NOT NULL VARCHAR2(1)
+ RECORD_INSERTION_TIME			   NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ BUNCH_X_NUMBER 			   NOT NULL NUMBER(4)
+ NORMALIZATION_ET				    NUMBER(36)
+ ET_LUMI					    NUMBER(9,6)
+ ET_LUMI_ERR					    NUMBER(10,7)
+ ET_LUMI_QLTY					    NUMBER(3)
+ NORMALIZATION_OCC_D1				    NUMBER(36)
+ OCC_LUMI_D1					    NUMBER(9,6)
+ OCC_LUMI_D1_ERR				    NUMBER(10,7)
+ OCC_LUMI_D1_QLTY				    NUMBER(3)
+ NORMALIZATION_OCC_D2				    NUMBER(36)
+ OCC_LUMI_D2					    NUMBER(9,6)
+ OCC_LUMI_D2_ERR				    NUMBER(10,7)
+ OCC_LUMI_D2_QLTY				    NUMBER(3)
+ RECORD_INSERTION_USER				    VARCHAR2(50)
+
+SQL> describe cms_lumi.lumi_summaries;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
  LUMI_SUMMARY_ID			   NOT NULL NUMBER(38)
+ SECTION_ID				   NOT NULL NUMBER(38)
  LUMI_TAG_ID				   NOT NULL NUMBER(38)
  IS_RECORD_DELETED			   NOT NULL VARCHAR2(1)
  RECORD_INSERTION_TIME			   NOT NULL TIMESTAMP(6) WITH TIME ZONE
+ LUMI_VERSION					    NUMBER(2)
+ DEADTIME_NORMALIZATION 			    NUMBER(7,6)
+ NORMALIZATION					    NUMBER(36)
+ INSTANT_LUMI					    NUMBER(9,6)
+ INSTANT_LUMI_ERR				    NUMBER(10,7)
+ INSTANT_LUMI_QLTY				    NUMBER(3)
+ NORMALIZATION_ET				    NUMBER(36)
+ INSTANT_ET_LUMI				    NUMBER(9,6)
+ INSTANT_ET_LUMI_ERR				    NUMBER(10,7)
+ INSTANT_ET_LUMI_QLTY				    NUMBER(3)
+ NORMALIZATION_OCC_D1				    NUMBER(36)
+ INSTANT_OCC_LUMI_D1				    NUMBER(9,6)
+ INSTANT_OCC_LUMI_D1_ERR			    NUMBER(10,7)
+ INSTANT_OCC_LUMI_D1_QLTY			    NUMBER(3)
+ NORMALIZATION_OCC_D2				    NUMBER(36)
+ INSTANT_OCC_LUMI_D2				    NUMBER(9,6)
+ INSTANT_OCC_LUMI_D2_ERR			    NUMBER(10,7)
+ INSTANT_OCC_LUMI_D2_QLTY			    NUMBER(3)
  RECORD_INSERTION_USER				    VARCHAR2(50)
 
-SQL> describe cms_lumi.LUMI_TAGS;
- Name					   Null?    Type
- ----------------------------------------- -------- ----------------------------
- LUMI_TAG_ID				   NOT NULL NUMBER(38)
- TAG_NAME				   NOT NULL VARCHAR2(50)
- RECORD_INSERTION_TIME			   NOT NULL TIMESTAMP(6) WITH TIME ZONE
- RECORD_INSERTION_USER				    VARCHAR2(50)
+
+select r.run_number,r.lumi_section_number,summary.lumi_version,summary.instant_lumi,r.record_insertion_user,r.comments from cms_lumi.lumi_summaries summary,cms_lumi.lumi_sections r where summary.section_id=r.section_id and r.lumi_section_number>0 order by r.run_number;
 
 
+select record_insertion_time from cms_lumi.lumi_summaries;
+
+select r.run_number,r.lumi_section_number,d.bunch_x_number,d.et_lumi from cms_lumi.lumi_details d,cms_lumi.lumi_sections r where d.section_id=r.section_id and r.lumi_section_number>0 and r.run_number=207418;
+
+
+select summary.NORMALIZATION,summary.INSTANT_LUMI,summary.INSTANT_LUMI_ERR,summary.INSTANT_LUMI_QLTY,sect.LUMI_SECTION_NUMBER, bx.BUNCH_X_NUMBER,bx.ET_LUMI,bx.ET_LUMI_ERR,bx.ET_LUMI_QLTY from CMS_LUMI.LUMI_SUMMARIES summary, CMS_LUMI.LUMI_DETAILS bx, CMS_LUMI.LUMI_SECTIONS sect WHERE sect.SECTION_ID=summary.SECTION_ID AND sect.SECTION_ID=bx.SECTION_ID AND sect.lumi_section_number>0 AND sect.RUN_NUMBER=207418 and summary.lumi_version=1 ORDER BY sect.LUMI_SECTION_NUMBER

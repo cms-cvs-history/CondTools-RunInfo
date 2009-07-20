@@ -13,7 +13,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     logconnect = cms.untracked.string('sqlite_file:log.db'),
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('LuminosityInfoRcd'),
-        tag = cms.string('lumi83037_v1')
+        tag = cms.string('lumidummy_v1')
     ))
 )
 
@@ -27,7 +27,7 @@ process.source = cms.Source("EmptyIOVSource",
 process.lumio2o = cms.EDAnalyzer("LuminosityPopConAnalyzer",
     Source = cms.PSet(
       lumiReaderName = cms.string('omds'),
-      startRun = cms.int32(83037),
+      startRun = cms.int32(207418),
       numberOfRuns = cms.untracked.int32(1),
       connect = cms.string('oracle://cms_omds_lb/CMS_LUMI'),
       lumiVersionNumber = cms.int32(1),
