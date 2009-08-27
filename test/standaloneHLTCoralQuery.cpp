@@ -4,6 +4,10 @@
 #include "CoralBase/Exception.h"
 #include "CoralBase/TimeStamp.h"
 #include "CoralBase/MessageStream.h"
+#include "CoralKernel/Context.h"
+#include "CoralKernel/IHandle.h"
+#include "CoralKernel/IProperty.h"
+#include "CoralKernel/IPropertyManager.h"
 #include "RelationalAccess/AccessMode.h"
 #include "RelationalAccess/ConnectionService.h"
 #include "RelationalAccess/ISessionProxy.h"
@@ -22,16 +26,17 @@ int main(){
      select l.PATHNAME,l.LSNUMBER,l.L1PASS,l.PACCEPT,m.PSVALUE from hlt_supervisor_lumisections_v2 l, hlt_supervisor_scalar_map m where l.RUNNR=m.RUNNR and l.PSINDEX=m.PSINDEX and l.PATHNAME=m.PATHNAME and l.RUNNR=83037 order by l.LSNUMBER;
   **/
   std::string serviceName("oracle://cms_rcms/CMS_RUNINFO");
-  std::string authPath("/nfshome/xiezhen");
-  int startRun=102310;
+  std::string authName("/nfshome0/xiezhen/authentication.xml");
+  int startRun=108239;
   int numberOfRuns=1;
   std::string tabname("HLT_SUPERVISOR_LUMISECTIONS_V2");
   std::string maptabname("HLT_SUPERVISOR_SCALAR_MAP");
   try{
     coral::ConnectionService* conService = new coral::ConnectionService();
-    coral::ISessionProxy* session = conService->connect( serviceName, coral::ReadOnly);
+    coral::Context::instance().PropertyManager().property("AuthenticationFile")->set(authName);
     conService->configuration().setAuthenticationService("CORAL/Services/XMLAuthenticationService");
     coral::MessageStream::setMsgVerbosity(coral::Error);
+    coral::ISessionProxy* session = conService->connect( serviceName, coral::ReadOnly);
     coral::ITransaction& transaction=session->transaction();
     transaction.start(true); //true means readonly transaction
 
@@ -39,13 +44,13 @@ int main(){
     bindVariableList.extend("runnumber",typeid(int));
     int stopRun=startRun+numberOfRuns;
     std::cout<<"schema name "<<session->nominalSchema().schemaName()<<std::endl;
-    /**    //uncomment if you want to see all the visible tables
+      //uncomment if you want to see all the visible tables
        std::set<std::string> listoftabs;
        listoftabs=session->nominalSchema().listTables();
        for( std::set<std::string>::iterator it=listoftabs.begin(); it!=listoftabs.end();++it ){
        std::cout<<"tab: "<<*it<<std::endl;
        } 
-    **/
+    
     
     if( !session->nominalSchema().existsTable(tabname) ) throw std::runtime_error("table not found");
     
@@ -94,23 +99,23 @@ int main(){
 	std::cout<<"current run "<<currentRun<<std::endl;
 	std::cout<<"currentLumiSection "<<currentLumiSection<<std::endl;
 	std::cout<<"current path number "<<currentPath<<std::endl;
-	std::cout<<"hltinput "<<row["hltinput"].data<long long>();
-	std::cout<<"hltratecounter "<<row["hltratecounter"].data<long long>();
-	std::cout<<"hltpathname "<<row["pathname"].data<std::string>();
-	std::cout<<"hltprescale "<<row["prescale"].data<long long>();
+	std::cout<<"hltinput "<<row["hltinput"].data<long long>()<<std::endl;
+	std::cout<<"hltratecounter "<<row["hltratecounter"].data<long long>()<<std::endl;
+	std::cout<<"hltpathname "<<row["pathname"].data<std::string>()<<std::endl;
+	std::cout<<"hltprescale "<<row["prescale"].data<long long>()<<std::endl;
 	if(currentPath==npath){
-	  std::cout<<"This is the end of lumisection"<<std::endl;
+	  std::cout<<"=====This is the end of lumisection===="<<currentRun<<":"<<currentLumiSection<<std::endl;
 	  currentPath=0;
 	}//end if it's last path in the current lumisection	 
 	++currentPath;
       }
       cursor1.close();
       delete query1;
-      delete session;
-      delete conService;
     }
     std::cout<<"commit transaction"<<std::endl;
-    transaction.commit(); 
+    transaction.commit();
+    delete session;
+    delete conService; 
   }catch(const std::exception& er){
     std::cout<<"caught exception "<<er.what()<<std::endl;
     throw er;
