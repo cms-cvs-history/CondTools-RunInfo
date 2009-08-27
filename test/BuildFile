@@ -1,0 +1,6 @@
+<bin file=standaloneHLTCoralQuery.cpp name=standaloneHLTCoralQuery>
+<use name=CoralCommon>
+<use name=CoralCommon>
+<use name=CoralKernel>
+<use name=RelationalAccess>
+</bin>
