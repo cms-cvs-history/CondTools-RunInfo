@@ -8,7 +8,7 @@ SQL> describe CMS_GT_MON.GT_MON_TRIG_ALGO_VIEW ;
  COUNTS 					    NUMBER(10)
  RATEHZ 					    NUMBER
 
-select ratehz,lsnr,algobit from cms_gt_mon.gt_mon_trig_algo_view where runnr=110823 order by lsnr,algobit;
+select counts,lsnr,algobit from cms_gt_mon.gt_mon_trig_algo_view where runnr=110823 order by lsnr,algobit;
 
 SQL> describe CMS_GT_MON.GT_MON_TRIG_TECH_VIEW ;
  Name					   Null?    Type
@@ -29,7 +29,7 @@ SQL> describe CMS_GT_MON.GT_MON_TRIG_DEAD_VIEW ;
  DEADCOUNTER					    VARCHAR2(1000)
  COUNTS 	
 
-select lsnr,counts*25e-9 deadtime_s from cms_gt_mon.gt_mon_trig_dead_view where runnr=110823 and deadcounter='Deadtime' order by lsnr;
+select lsnr,counts from cms_gt_mon.gt_mon_trig_dead_view where runnr=110823 and deadcounter='Deadtime' order by lsnr;
 
 SQL> describe CMS_GT.GT_RUN_ALGO_VIEW;
  Name					   Null?    Type
