@@ -20,6 +20,8 @@ SQL> describe CMS_GT_MON.GT_MON_TRIG_TECH_VIEW ;
  COUNTS 					    NUMBER(10)
  RATEHZ 					    NUMBER
 
+select counts,lsnr,techbit from  from cms_gt_mon.gt_mon_trig_tech_view where runnr=110823 order by lsnr,techbit;
+
 SQL> describe CMS_GT_MON.GT_MON_TRIG_DEAD_VIEW ;
  Name					   Null?    Type
  ----------------------------------------- -------- ----------------------------
@@ -34,7 +36,7 @@ select lsnr,counts from cms_gt_mon.gt_mon_trig_dead_view where runnr=110823 and 
 
 SQL> describe CMS_GT.GT_RUN_ALGO_VIEW;
  Name					   Null?    Type
- ----------------------------------------- -------- ----------------------------
+ ----------------------------------------- -------- ---------------------------
  RUNNUMBER				   NOT NULL NUMBER(10)
  ALGO_INDEX				   NOT NULL NUMBER(3)
  NAME		                                    VARCHAR2(300)
@@ -49,8 +51,7 @@ SQL> describe CMS_GT.GT_RUN_TECH_VIEW;
  TECHTRIG_INDEX 			   NOT NULL NUMBER(3)
  NAME						    VARCHAR2(300)
 
-select techtrig_index,name from cms_gt.gt_run_tech_view where runnumber=110823;
-
+select techtrig_index,name from cms_gt.gt_run_tech_view where runnumber=110823 order by techtrig_index;
 
 SQL> describe CMS_GT.GT_RUN_PRESC_ALGO_VIEW;
 Name					   Null?    Type

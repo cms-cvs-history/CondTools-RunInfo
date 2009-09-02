@@ -22,22 +22,37 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-//fixed size 128+64. Note: position has meanings
-typedef std::vector<unsigned int> BITCOUNT;
-typedef std::vector<std::string> BITNAME;
-typedef std::vector<unsigned int> BITPRESCALE;
 
+//per lumisection information
 typedef unsigned int DEADCOUNT;
-
-typedef std::vector<BITCOUNT> TriggerCountResult;//variable size positioned by sorted lumisections.Position has meanings
-
-typedef std::vector<BITNAME> TriggerNameResult;
-typedef std::vector<BITPRESCALE> PrescaleResult;
 typedef std::vector<DEADCOUNT> TriggerDeadCountResult;
+//per lumisection information aggregate by trigger bit
+typedef std::vector<unsigned int> BITCOUNT;
+typedef std::vector<unsigned int> BITPRESCALE;
+typedef std::vector<BITCOUNT> TriggerCountResult_Algo;
+typedef std::vector<BITCOUNT> TriggerCountResult_Tech;
+typedef std::vector<BITPRESCALE> PrescaleResult_Algo;//NB.constant in run
+typedef std::vector<BITPRESCALE> PrescaleResult_Tech;//NB.constant in run
+//per run information
+typedef std::vector<std::string> TriggerNameResult_Algo;
+typedef std::vector<std::string> TriggerNameResult_Tech;
 
-void printResult(const TriggerCountResult& triggercountresult){
+void printCountResult(const TriggerCountResult_Algo& algo,
+		      const TriggerCountResult_Tech& tech){
   size_t lumisec=0;
-  for(TriggerCountResult::const_iterator it=triggercountresult.begin();it!=triggercountresult.end();++it){
+  std::cout<<"===Algorithm trigger counts==="<<std::endl;
+  for(TriggerCountResult_Algo::const_iterator it=algo.begin();it!=algo.end();++it){
+    std::cout<<"lumisec "<<lumisec<<std::endl;
+    ++lumisec;
+    size_t bitidx=0;
+    for(BITCOUNT::const_iterator itt=it->begin();itt!=it->end();++itt){
+      std::cout<<"\t bit: "<<bitidx<<" : count : "<<*itt<<std::endl;
+      ++bitidx;
+    }
+  }
+  std::cout<<"===Technical trigger counts==="<<std::endl;
+  lumisec=0;//reset lumisec counter
+  for(TriggerCountResult_Tech::const_iterator it=tech.begin();it!=tech.end();++it){
     std::cout<<"lumisec "<<lumisec<<std::endl;
     ++lumisec;
     size_t bitidx=0;
@@ -47,6 +62,34 @@ void printResult(const TriggerCountResult& triggercountresult){
     }
   }
 }
+
+void printDeadTimeResult(const TriggerDeadCountResult& result){
+  size_t lumisec=0;
+  std::cout<<"===Deadtime counts==="<<std::endl;
+  for(TriggerDeadCountResult::const_iterator it=result.begin();it!=result.end();++it){
+    std::cout<<"lumisec "<<lumisec<<" : counts : "<<*it<<std::endl;
+    ++lumisec;
+  }
+}
+
+void printTriggerNameResult(const TriggerNameResult_Algo& algonames,
+			    const TriggerNameResult_Tech& technames){
+  size_t bitidx=0;
+  std::cout<<"===Algorithm trigger bit name==="<<std::endl;
+  for(TriggerNameResult_Algo::const_iterator it=algonames.begin();
+      it!=algonames.end();++it){
+    std::cout<<"\t bit: "<<bitidx<<" : name : "<<*it<<std::endl;
+    ++bitidx;    
+  }
+  bitidx=0;
+  std::cout<<"===Tech trigger bit name==="<<std::endl;
+  for(TriggerNameResult_Tech::const_iterator it=technames.begin();
+      it!=technames.end();++it){
+    std::cout<<"\t bit: "<<bitidx<<" : name : "<<*it<<std::endl;
+    ++bitidx;    
+  }
+}
+
 int main(){
   std::string serviceName("oracle://cms_omds_lb/CMS_GT_MON");
   std::string authName("/nfshome0/xiezhen/authentication.xml");
@@ -79,20 +122,22 @@ int main(){
     std::cout<<"schema name "<<session->schema(gtmonschema).schemaName()<<std::endl;
     //uncomment if you want to see all the visible views
     /**std::set<std::string> listofviews;
-    listofviews=session->schema(gtmonschema).listViews();
-    for( std::set<std::string>::iterator it=listofviews.begin(); it!=listofviews.end();++it ){
-      std::cout<<"view: "<<*it<<std::endl;
-    } 
-    std::cout<<"schema name "<<session->schema(gtschema).schemaName()<<std::endl;
+       listofviews=session->schema(gtmonschema).listViews();
+       for( std::set<std::string>::iterator it=listofviews.begin(); it!=listofviews.end();++it ){
+       std::cout<<"view: "<<*it<<std::endl;
+       } 
+       std::cout<<"schema name "<<session->schema(gtschema).schemaName()<<std::endl;
+       listofviews.clear();
+       listofviews=session->schema(gtschema).listViews();
+       for( std::set<std::string>::iterator it=listofviews.begin(); it!=listofviews.end();++it ){
+       std::cout<<"view: "<<*it<<std::endl;
+       } 
+       std::cout<<"commit transaction"<<std::endl;
     **/
-    //uncomment if you want to see all the visible views
-    /**listofviews.clear();
-    listofviews=session->schema(gtschema).listViews();
-    for( std::set<std::string>::iterator it=listofviews.begin(); it!=listofviews.end();++it ){
-      std::cout<<"view: "<<*it<<std::endl;
-    } 
-    std::cout<<"commit transaction"<<std::endl;
     transaction.commit();
+    /**
+       Part I
+       query tables in schema cms_gt_mon
     **/
     transaction.start(true);
     coral::ISchema& gtmonschemaHandle=session->schema(gtmonschema);
@@ -106,8 +151,9 @@ int main(){
     if(!gtmonschemaHandle.existsView(deadviewname)){
       throw std::runtime_error(std::string("non-existing view ")+deadviewname);
     }
-    
+    //
     //select counts,lsnr,algobit from cms_gt_mon.gt_mon_trig_algo_view where runnr=:runnumber order by lsnr,algobit;
+    //
     coral::IQuery* Queryalgoview=gtmonschemaHandle.newQuery();
     Queryalgoview->addToTableList(algoviewname);
     coral::AttributeList qalgoOutput;
@@ -130,23 +176,109 @@ int main(){
       return 0;
     }
     unsigned int s=0;
-    BITCOUNT mybitcount; 
-    TriggerCountResult countresult;
-    mybitcount.reserve(128);
+    BITCOUNT mybitcount_algo; 
+    mybitcount_algo.reserve(128);
+    TriggerCountResult_Algo countresult_algo;
     while( c.next() ){
       const coral::AttributeList& row = c.currentRow();     
       //row.toOutputStream( std::cout ) << std::endl;
-      unsigned int lsnr=row["lsnr"].data<unsigned int>();
+      //unsigned int lsnr=row["lsnr"].data<unsigned int>();
       unsigned int count=row["counts"].data<unsigned int>();
       if(s%128==0&&s!=0){
-	countresult.push_back(mybitcount);
-	mybitcount.clear();
+	countresult_algo.push_back(mybitcount_algo);
+	mybitcount_algo.clear();
       }
-      mybitcount.push_back(count);
+      mybitcount_algo.push_back(count);
       ++s;
     }
+    delete Queryalgoview;
+    //
+    //select counts,lsnr,techbit from cms_gt_mon.gt_mon_trig_tech_view where runnr=:runnumber order by lsnr,techbit;
+    //
+    TriggerCountResult_Tech countresult_tech;
+    BITCOUNT mybitcount_tech; 
+    mybitcount_tech.reserve(64);
+    coral::IQuery* Querytechview=gtmonschemaHandle.newQuery();
+    Querytechview->addToTableList(techviewname);
+    coral::AttributeList qtechOutput;
+    qtechOutput.extend("counts",typeid(unsigned int));
+    qtechOutput.extend("lsnr",typeid(unsigned int));
+    qtechOutput.extend("techbit",typeid(unsigned int));
+    Querytechview->addToOutputList("counts");
+    Querytechview->addToOutputList("lsnr");
+    Querytechview->addToOutputList("techbit");
+    Querytechview->setCondition("RUNNR =:runnumber",bindVariableList);
+    Querytechview->addToOrderList("lsnr");
+    Querytechview->addToOrderList("techbit");
+    Querytechview->defineOutput(qtechOutput);
+    coral::ICursor& techcursor=Queryalgoview->execute();
+    if( !techcursor.next() ){
+      std::cout<<"requested run "<<run<<" doesn't exist, do nothing"<<std::endl;
+      techcursor.close();
+      delete Querytechview;
+      transaction.commit();
+      return 0;
+    }
+    s=0;
+    while( techcursor.next() ){
+      const coral::AttributeList& row = techcursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;
+      //unsigned int lsnr=row["lsnr"].data<unsigned int>();
+      unsigned int count=row["counts"].data<unsigned int>();
+      if(s%64==0&&s!=0){
+	countresult_tech.push_back(mybitcount_tech);
+	mybitcount_tech.clear();
+      }
+      mybitcount_tech.push_back(count);
+      ++s;
+    }
+    delete Querytechview;
+
+    //
+    //select counts,lsnr from cms_gt_mon.gt_mon_trig_dead_view where runnr=:runnumber and deadcounter=:countername order by lsnr;
+    //
+    TriggerDeadCountResult deadresult;
+    coral::IQuery* Querydeadview=gtmonschemaHandle.newQuery();
+    Querydeadview->addToTableList(deadviewname);
+    coral::AttributeList qdeadOutput;
+    qdeadOutput.extend("counts",typeid(unsigned int));
+    qdeadOutput.extend("lsnr",typeid(unsigned int));
+    Querydeadview->addToOutputList("counts");
+    Querydeadview->addToOutputList("lsnr");
+    coral::AttributeList bindVariablesDead;
+    bindVariablesDead.extend("runnumber",typeid(int));
+    bindVariablesDead.extend("countername",typeid(std::string));
+    bindVariablesDead["runnumber"].data<int>()=run;
+    bindVariablesDead["countername"].data<std::string>()=std::string("Deadtime");
+    Querydeadview->setCondition("RUNNR =:runnumber AND DEADCOUNTER =:countername",bindVariablesDead);
+    Querydeadview->addToOrderList("lsnr");
+    Querydeadview->defineOutput(qdeadOutput);
+    coral::ICursor& deadcursor=Querydeadview->execute();
+    if( !deadcursor.next() ){
+      std::cout<<"requested run "<<run<<" doesn't exist, do nothing"<<std::endl;
+      deadcursor.close();
+      delete Querydeadview;
+      transaction.commit();
+      return 0;
+    }
+    s=0;
+    TriggerDeadCountResult deadtimeresult;
+    while( deadcursor.next() ){
+      const coral::AttributeList& row = deadcursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;
+      //unsigned int lsnr=row["lsnr"].data<unsigned int>();
+      unsigned int count=row["counts"].data<unsigned int>();
+      deadtimeresult.push_back(count);
+      ++s;
+    }
+    delete Querydeadview;
     transaction.commit();
-    printResult(countresult);
+    printCountResult(countresult_algo,countresult_tech);
+    printDeadTimeResult(deadtimeresult);
+    /**
+       Part II
+       query tables in schema cms_gt
+     **/
     transaction.start(true);
     coral::ISchema& gtschemaHandle=session->schema(gtschema);
     if(!gtschemaHandle.existsView(runtechviewname)){
@@ -161,8 +293,80 @@ int main(){
     if(!gtschemaHandle.existsView(runpresctechviewname)){
       throw std::runtime_error(std::string("non-existing view ")+runpresctechviewname);
     }
-    
+    //
+    //select algo_index,name from cms_gt.gt_run_algo_view where runnumber=:runnumber order by algo_index;
+    //
+    std::map<unsigned int,std::string> triggernamemap;
+    coral::IQuery* QueryName=gtschemaHandle.newQuery();
+    QueryName->addToTableList(runalgoviewname);
+    coral::AttributeList qAlgoNameOutput;
+    qAlgoNameOutput.extend("algo_index",typeid(unsigned int));
+    qAlgoNameOutput.extend("name",typeid(std::string));
+    QueryName->addToOutputList("algo_index");
+    QueryName->addToOutputList("name");
+    QueryName->setCondition("runnumber =:runnumber",bindVariableList);
+    QueryName->addToOrderList("algo_index");
+    QueryName->defineOutput(qAlgoNameOutput);
+    coral::ICursor& algonamecursor=QueryName->execute();
+    while( algonamecursor.next() ){
+      const coral::AttributeList& row = algonamecursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;
+      unsigned int algo_index=row["algo_index"].data<unsigned int>();
+      std::string algo_name=row["name"].data<std::string>();
+      triggernamemap.insert(std::make_pair(algo_index,algo_name));
+    }
+    delete QueryName;
+
+    //
+    //select techtrig_index,name from cms_gt.gt_run_tech_view where runnumber=:runnumber order by techtrig_index;
+    //
+    std::map<unsigned int,std::string> techtriggernamemap;
+    coral::IQuery* QueryTechName=gtschemaHandle.newQuery();
+    QueryTechName->addToTableList(runtechviewname);
+    coral::AttributeList qTechNameOutput;
+    qTechNameOutput.extend("techtrig_index",typeid(unsigned int));
+    qTechNameOutput.extend("name",typeid(std::string));
+    QueryTechName->addToOutputList("techtrig_index");
+    QueryTechName->addToOutputList("name");
+    QueryTechName->setCondition("runnumber =:runnumber",bindVariableList);
+    QueryTechName->addToOrderList("techtrig_index");
+    QueryTechName->defineOutput(qTechNameOutput);
+    coral::ICursor& technamecursor=QueryTechName->execute();
+    while( technamecursor.next() ){
+      const coral::AttributeList& row = technamecursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;
+      unsigned int tech_index=row["techtrig_index"].data<unsigned int>();
+      std::string tech_name=row["name"].data<std::string>();
+      techtriggernamemap.insert(std::make_pair(tech_index,tech_name));
+    }
+    delete QueryTechName;
     transaction.commit();
+
+    //reprocess Algo name result filling unallocated trigger bit with string "False"
+    TriggerNameResult_Algo nameresult_algo;    
+    nameresult_algo.reserve(128);
+    for(size_t algoidx=0;algoidx<128;++algoidx){
+      std::map<unsigned int,std::string>::iterator pos=triggernamemap.find(algoidx);
+      if(pos!=triggernamemap.end()){
+	nameresult_algo.push_back(pos->second);
+      }else{
+	nameresult_algo.push_back("False");
+      }
+    }
+    //reprocess Tech name result filling unallocated trigger bit with string "False"
+    TriggerNameResult_Tech nameresult_tech;
+    nameresult_tech.reserve(64);
+    for(size_t techidx=0;techidx<64;++techidx){
+      std::map<unsigned int,std::string>::iterator pos=techtriggernamemap.find(techidx);
+      if(pos!=techtriggernamemap.end()){
+	nameresult_tech.push_back(pos->second);
+      }else{
+	nameresult_tech.push_back("False");
+      }
+    }
+    
+    printTriggerNameResult(nameresult_algo,nameresult_tech);
+
     delete session;
     delete conService; 
   }catch(const std::exception& er){
