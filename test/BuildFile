@@ -1,3 +1,4 @@
+<bin file=str2int.cpp></bin>
 <bin file=standaloneHLTCoralQuery.cpp name=standaloneHLTCoralQuery>
 <use name=CoralBase>
 <use name=CoralCommon>

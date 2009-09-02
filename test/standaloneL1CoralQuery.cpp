@@ -22,20 +22,20 @@
 #include <iostream>
 #include <exception>
 #include <vector>
-
+#include <stdio.h>
+#include <stdlib.h>
+//per run information
+typedef std::vector<std::string> TriggerNameResult_Algo;
+typedef std::vector<std::string> TriggerNameResult_Tech;
+typedef std::vector<unsigned int> PrescaleResult_Algo;
+typedef std::vector<unsigned int> PrescaleResult_Tech;
 //per lumisection information
 typedef unsigned int DEADCOUNT;
 typedef std::vector<DEADCOUNT> TriggerDeadCountResult;
 //per lumisection information aggregate by trigger bit
 typedef std::vector<unsigned int> BITCOUNT;
-typedef std::vector<unsigned int> BITPRESCALE;
 typedef std::vector<BITCOUNT> TriggerCountResult_Algo;
 typedef std::vector<BITCOUNT> TriggerCountResult_Tech;
-typedef std::vector<BITPRESCALE> PrescaleResult_Algo;//NB.constant in run
-typedef std::vector<BITPRESCALE> PrescaleResult_Tech;//NB.constant in run
-//per run information
-typedef std::vector<std::string> TriggerNameResult_Algo;
-typedef std::vector<std::string> TriggerNameResult_Tech;
 
 void printCountResult(const TriggerCountResult_Algo& algo,
 		      const TriggerCountResult_Tech& tech){
@@ -90,6 +90,38 @@ void printTriggerNameResult(const TriggerNameResult_Algo& algonames,
   }
 }
 
+void printPrescaleResult(const PrescaleResult_Algo& algo,
+			 const PrescaleResult_Tech& tech){
+  size_t bitidx=0;
+  std::cout<<"===Algorithm trigger bit prescale==="<<std::endl;
+  for(PrescaleResult_Algo::const_iterator it=algo.begin();
+      it!=algo.end();++it){
+    std::cout<<"\t bit: "<<bitidx<<" : prescale : "<<*it<<std::endl;
+    ++bitidx;    
+  }
+  bitidx=0;
+  std::cout<<"===Tech trigger bit prescale==="<<std::endl;
+  for(PrescaleResult_Tech::const_iterator it=tech.begin();
+      it!=tech.end();++it){
+    std::cout<<"\t bit: "<<bitidx<<" : prescale : "<<*it<<std::endl;
+    ++bitidx;    
+  }
+}
+//helper functions
+int str2int(const std::string& s){
+  std::istringstream myStream(s);
+  int i=0;
+  if( ! myStream>>i ) throw std::runtime_error(std::string("cannot convert ")+s);
+  return i;
+}
+std::string int2str(int t){
+  std::stringstream ss;
+  ss.width(3);
+  ss.fill('0');
+  ss<<t;
+  return ss.str();
+}
+
 int main(){
   std::string serviceName("oracle://cms_omds_lb/CMS_GT_MON");
   std::string authName("/nfshome0/xiezhen/authentication.xml");
@@ -105,7 +137,7 @@ int main(){
   std::string runalgoviewname("GT_RUN_ALGO_VIEW");
   std::string runprescalgoviewname("GT_RUN_PRESC_ALGO_VIEW");
   std::string runpresctechviewname("GT_RUN_PRESC_TECH_VIEW");
-  
+  std::cout<<"=======This is run "+int2str(run)<<" ======="<<std::endl;
   try{
     coral::ConnectionService* conService = new coral::ConnectionService();
     coral::Context::instance().PropertyManager().property("AuthenticationFile")->set(authName);
@@ -119,9 +151,10 @@ int main(){
     coral::AttributeList bindVariableList;
     bindVariableList.extend("runnumber",typeid(int));
     bindVariableList["runnumber"].data<int>()=run;
-    std::cout<<"schema name "<<session->schema(gtmonschema).schemaName()<<std::endl;
     //uncomment if you want to see all the visible views
-    /**std::set<std::string> listofviews;
+    /**
+       std::cout<<"schema name "<<session->schema(gtmonschema).schemaName()<<std::endl;
+       std::set<std::string> listofviews;
        listofviews=session->schema(gtmonschema).listViews();
        for( std::set<std::string>::iterator it=listofviews.begin(); it!=listofviews.end();++it ){
        std::cout<<"view: "<<*it<<std::endl;
@@ -340,6 +373,74 @@ int main(){
       techtriggernamemap.insert(std::make_pair(tech_index,tech_name));
     }
     delete QueryTechName;
+
+    //
+    //select prescale_factor_algo_000,prescale_factor_algo_001..._127 from cms_gt.gt_run_presc_algo_view where runr=:runnumber and prescale_index=0;
+    //    
+    coral::IQuery* QueryAlgoPresc=gtschemaHandle.newQuery();
+    QueryAlgoPresc->addToTableList(runprescalgoviewname);
+    coral::AttributeList qAlgoPrescOutput;
+    std::string algoprescBase("PRESCALE_FACTOR_ALGO_");
+    for(int bitidx=0;bitidx<128;++bitidx){
+      std::string algopresc=algoprescBase+int2str(bitidx);
+      qAlgoPrescOutput.extend(algopresc,typeid(unsigned int));
+    }
+    for(int bitidx=0;bitidx<128;++bitidx){
+      std::string algopresc=algoprescBase+int2str(bitidx);
+      QueryAlgoPresc->addToOutputList(algopresc);
+    }
+    coral::AttributeList PrescbindVariable;
+    PrescbindVariable.extend("runnumber",typeid(int));
+    PrescbindVariable.extend("prescaleindex",typeid(int));
+    PrescbindVariable["runnumber"].data<int>()=run;
+    PrescbindVariable["prescaleindex"].data<int>()=0;
+    QueryAlgoPresc->setCondition("runnr =:runnumber AND prescale_index =:prescaleindex",PrescbindVariable);
+    QueryAlgoPresc->defineOutput(qAlgoPrescOutput);
+    coral::ICursor& algopresccursor=QueryAlgoPresc->execute();
+    PrescaleResult_Algo prescResult_algo;
+    while( algopresccursor.next() ){
+      const coral::AttributeList& row = algopresccursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;  
+      for(int bitidx=0;bitidx<128;++bitidx){
+	std::string algopresc=algoprescBase+int2str(bitidx);
+	prescResult_algo.push_back(row[algopresc].data<unsigned int>());
+      }
+    }
+    delete QueryAlgoPresc;
+    
+    //
+    //select prescale_factor_tt_000,prescale_factor_tt_001..._63 from cms_gt.gt_run_presc_tech_view where runr=:runnumber and prescale_index=0;
+    //    
+    coral::IQuery* QueryTechPresc=gtschemaHandle.newQuery();
+    QueryTechPresc->addToTableList(runpresctechviewname);
+    coral::AttributeList qTechPrescOutput;
+    std::string techprescBase("PRESCALE_FACTOR_TT_");
+    for(int bitidx=0;bitidx<64;++bitidx){
+      std::string techpresc=techprescBase+int2str(bitidx);
+      qTechPrescOutput.extend(techpresc,typeid(unsigned int));
+    }
+    for(int bitidx=0;bitidx<64;++bitidx){
+      std::string techpresc=techprescBase+int2str(bitidx);
+      QueryTechPresc->addToOutputList(techpresc);
+    }
+    coral::AttributeList TechPrescbindVariable;
+    TechPrescbindVariable.extend("runnumber",typeid(int));
+    TechPrescbindVariable.extend("prescaleindex",typeid(int));
+    TechPrescbindVariable["runnumber"].data<int>()=run;
+    TechPrescbindVariable["prescaleindex"].data<int>()=0;
+    QueryTechPresc->setCondition("runnr =:runnumber AND prescale_index =:prescaleindex",TechPrescbindVariable);
+    QueryTechPresc->defineOutput(qTechPrescOutput);
+    coral::ICursor& techpresccursor=QueryTechPresc->execute();
+    PrescaleResult_Tech prescResult_tech;
+    while( techpresccursor.next() ){
+      const coral::AttributeList& row = techpresccursor.currentRow();     
+      //row.toOutputStream( std::cout ) << std::endl;
+      for(int bitidx=0;bitidx<64;++bitidx){
+	std::string techpresc=techprescBase+int2str(bitidx);
+	prescResult_tech.push_back(row[techpresc].data<unsigned int>());
+      }
+    }
+    delete QueryTechPresc;
     transaction.commit();
 
     //reprocess Algo name result filling unallocated trigger bit with string "False"
@@ -364,9 +465,11 @@ int main(){
 	nameresult_tech.push_back("False");
       }
     }
-    
+    //dump trigger name information
     printTriggerNameResult(nameresult_algo,nameresult_tech);
-
+    //dump prescale information
+    printPrescaleResult(prescResult_algo,prescResult_tech);
+    
     delete session;
     delete conService; 
   }catch(const std::exception& er){
