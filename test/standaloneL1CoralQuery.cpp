@@ -108,12 +108,13 @@ void printPrescaleResult(const PrescaleResult_Algo& algo,
   }
 }
 //helper functions
-int str2int(const std::string& s){
+/*int str2int(const std::string& s){
   std::istringstream myStream(s);
   int i=0;
   if( ! myStream>>i ) throw std::runtime_error(std::string("cannot convert ")+s);
   return i;
 }
+*/
 std::string int2str(int t){
   std::stringstream ss;
   ss.width(3);
@@ -137,7 +138,7 @@ int main(){
   std::string runalgoviewname("GT_RUN_ALGO_VIEW");
   std::string runprescalgoviewname("GT_RUN_PRESC_ALGO_VIEW");
   std::string runpresctechviewname("GT_RUN_PRESC_TECH_VIEW");
-  std::cout<<"=======This is run "+int2str(run)<<" ======="<<std::endl;
+  std::cout<<"=======This is run "<<run<<" ======="<<std::endl;
   try{
     coral::ConnectionService* conService = new coral::ConnectionService();
     coral::Context::instance().PropertyManager().property("AuthenticationFile")->set(authName);
