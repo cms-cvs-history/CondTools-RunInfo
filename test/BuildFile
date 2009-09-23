@@ -6,6 +6,7 @@
 <use name=RelationalAccess>
 </bin>
 <bin file=standaloneL1CoralQuery.cpp name=standaloneL1CoralQuery>
+<use name=boost>
 <use name=CoralBase>
 <use name=CoralCommon>
 <use name=CoralKernel>

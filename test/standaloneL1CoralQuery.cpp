@@ -24,6 +24,10 @@
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/date_time/local_time_adjustor.hpp"
+#include "boost/date_time/c_local_time_adjustor.hpp"
+
 //per run information
 typedef std::vector<std::string> TriggerNameResult_Algo;
 typedef std::vector<std::string> TriggerNameResult_Tech;
@@ -32,11 +36,27 @@ typedef std::vector<unsigned int> PrescaleResult_Tech;
 //per lumisection information
 typedef unsigned int DEADCOUNT;
 typedef std::vector<DEADCOUNT> TriggerDeadCountResult;
+typedef std::vector<boost::posix_time::ptime> LumiTimestampResult;
 //per lumisection information aggregate by trigger bit
 typedef std::vector<unsigned int> BITCOUNT;
 typedef std::vector<BITCOUNT> TriggerCountResult_Algo;
 typedef std::vector<BITCOUNT> TriggerCountResult_Tech;
 
+//helper function to convert boost::posix_time::ptime to a 64bit uint
+typedef unsigned long long Time_t; //upper 32bit in sec; lower 32bit in microsec
+Time_t timeconversion(boost::posix_time::ptime pt){
+  boost::posix_time::time_duration td = pt - boost::posix_time::from_time_t(0);
+  unsigned long long t = td.total_seconds();
+  return (t<<32)+td.fractional_seconds() ;
+}
+void printLumiTimeResult(const LumiTimestampResult& timestamps){
+  size_t lumisec=0;
+  std::cout<<"===lumi section start time==="<<std::endl;
+  for(LumiTimestampResult::const_iterator it=timestamps.begin();it!=timestamps.end();++it){
+    std::cout<<"lumisec "<<lumisec<<" : start time : "<<(*it)<<std::endl;
+    ++lumisec;
+  }
+}
 void printCountResult(const TriggerCountResult_Algo& algo,
 		      const TriggerCountResult_Tech& tech){
   size_t lumisec=0;
@@ -126,12 +146,14 @@ std::string int2str(int t){
 int main(){
   std::string serviceName("oracle://cms_omds_lb/CMS_GT_MON");
   std::string authName("/nfshome0/xiezhen/authentication.xml");
-  int run=110823;
+  //int run=110823;
+  int run=110835;
   //two blocks of views in schema cms_gt_mon&cms_gt
   std::string gtmonschema("CMS_GT_MON");
   std::string algoviewname("GT_MON_TRIG_ALGO_VIEW");
   std::string techviewname("GT_MON_TRIG_TECH_VIEW");
   std::string deadviewname("GT_MON_TRIG_DEAD_VIEW");
+  std::string celltablename("GT_CELL_LUMISEG");
 
   std::string gtschema("CMS_GT");
   std::string runtechviewname("GT_RUN_TECH_VIEW");
@@ -184,6 +206,9 @@ int main(){
     }
     if(!gtmonschemaHandle.existsView(deadviewname)){
       throw std::runtime_error(std::string("non-existing view ")+deadviewname);
+    }
+    if(!gtmonschemaHandle.existsTable(celltablename)){
+      throw std::runtime_error(std::string("non-existing table ")+celltablename);
     }
     //
     //select counts,lsnr,algobit from cms_gt_mon.gt_mon_trig_algo_view where runnr=:runnumber order by lsnr,algobit;
@@ -306,9 +331,43 @@ int main(){
       ++s;
     }
     delete Querydeadview;
+
+    //
+    //select TIMESTAMP from cms_gt_mon.gt_cell_lumiseg where gtpartition0runnr=:runnumber order by lumisegmentnr;
+    //   
+    coral::IQuery* Querytimestamp=gtmonschemaHandle.tableHandle(celltablename).newQuery();
+    coral::AttributeList qtimestampOutput;
+    qtimestampOutput.extend("lumisegmentnr",typeid(unsigned int));
+    qtimestampOutput.extend("timestamp",typeid(coral::TimeStamp));
+    Querytimestamp->addToOutputList("lumisegmentnr");
+    Querytimestamp->addToOutputList("timestamp");
+    Querytimestamp->setCondition("gtpartition0runnr =: runnumber",bindVariableList);
+    Querytimestamp->addToOrderList("lumisegmentnr");
+    Querytimestamp->defineOutput(qtimestampOutput);
+    coral::ICursor& tpcursor=Querytimestamp->execute();
+    if( !tpcursor.next() ){
+      std::cout<<"requested run "<<run<<" doesn't exist, do nothing"<<std::endl;
+      tpcursor.close();
+      delete Querytimestamp;
+      transaction.commit();
+      return 0;
+    }
+    s=0;
+    LumiTimestampResult tpresult;
+    while( tpcursor.next() ){
+      const coral::AttributeList& row = tpcursor.currentRow();     
+      const boost::posix_time::ptime& t=row["timestamp"].data< coral::TimeStamp >().time();
+      tpresult.push_back(t);
+      //row.toOutputStream( std::cout ) << std::endl;
+      //unsigned int lsnr=row["lsnr"].data<unsigned int>();
+      ++s;
+    }
+    delete Querytimestamp;
     transaction.commit();
     printCountResult(countresult_algo,countresult_tech);
     printDeadTimeResult(deadtimeresult);
+    printLumiTimeResult(tpresult);
+
     /**
        Part II
        query tables in schema cms_gt

@@ -274,4 +274,4 @@ SQL> describe cms_gt_mon.gt_cell_lumiseg;
  TIMESTAMP					    TIMESTAMP(6)
  UNIQUEID				   NOT NULL VARCHAR2(1000)
 
-SQL> select timestamp from cms_gt_mon.gt_cell_lumiseg where gtpartition0runnr=110835 and lumisegmentnr=1;
+SQL> select timestamp from cms_gt_mon.gt_cell_lumiseg where gtpartition0runnr=110835 order by lumisegmentnr;
