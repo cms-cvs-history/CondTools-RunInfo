@@ -264,4 +264,14 @@ SQL> describe CMS_GT.GT_RUN_PRESC_TECH_VIEW #// NEED and PRESCALE_INDEX=0;
 
 SQL> select prescale_factor_tt_000,prescale_factor_tt_001 from cms_gt.gt_run_presc_tech_view where runnr=110823 and prescale_index=0;
 
+==========================================================================
+SQL> describe cms_gt_mon.gt_cell_lumiseg;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ CONTEXT					    VARCHAR2(1000)
+ GTPARTITION0RUNNR				    NUMBER(20)
+ LUMISEGMENTNR					    NUMBER(10)
+ TIMESTAMP					    TIMESTAMP(6)
+ UNIQUEID				   NOT NULL VARCHAR2(1000)
 
+SQL> select timestamp from cms_gt_mon.gt_cell_lumiseg where gtpartition0runnr=110835 and lumisegmentnr=1;
